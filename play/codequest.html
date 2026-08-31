@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>CodeQuest</title>
+  <style>html,body{margin:0;height:100%;background:#000}#g{width:100%;height:100%;border:none}</style>
+</head>
+<body>
+  <!-- Embedded iframe but spoofed to same-origin -->
+  <iframe id="g" style="display:block"></iframe>
+
+  <script>
+    const hijackUrl = "https://html5.gamedistribution.com/ef53683d27f74dc38f75f407ff351bc0/?gd_sdk_referrer_url=https%3A%2F%2Fwww.y8.com%2Fgames%2Fcodequest";
+
+    const f = document.getElementById("g");
+    f.src = hijackUrl;
+
+    f.onload = () => {
+      const swCode = `
+        self.addEventListener('fetch', event => {
+          const url = new URL(event.request.url);
+
+          // Spoof headers to make assets load successfully
+          const newHeaders = new Headers(event.request.headers);
+          newHeaders.set('Origin', 'https://www.y8.com');
+          newHeaders.set('Referer', 'https://www.y8.com/');
+
+          const newReq = new Request(url, {
+            method: event.request.method,
+            headers: newHeaders,
+            mode: 'cors',
+            credentials: 'include'
+          });
+
+          event.respondWith(fetch(newReq));
+        });
+
+        self.addEventListener('activate', () => self.clients.claim());
+      `;
+
+      const blob = new Blob([swCode], { type: "application/javascript" });
+      const swUrl = URL.createObjectURL(blob);
+
+      f.contentWindow.navigator.serviceWorker.register(swUrl, { scope: '/' })
+        .then(() => console.log("✅ Service Worker registered"))
+        .catch(err => console.warn("❌ SW failed", err));
+    };
+  </script>
+<footer style='text-align:center;padding:15px 0;'><custom-links>
+  <a href="https://hyper-gamers-den.web.app/x-to-y-almost-impossible.html" target="_blank" rel="noopener">X To Y Almost Impossible</a>
+  <a href="https://vuagamemienphi24h.pages.dev/mahjong-connect-gold.html" target="_blank" rel="noopener">Mahjong Connect Gold</a>
+  <a href="https://muryo-gemu-tengoku.pages.dev/rooftop-challenge.html" target="_blank" rel="noopener">Rooftop Challenge</a>
+  <a href="https://retro-arcade-zone.netlify.app/steal-a-fish.html" target="_blank" rel="noopener">Steal A Fish</a>
+</custom-links></footer></body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Wave Dash: Geometry Arrow</title>
+  <style>html,body{margin:0;height:100%;background:#000}#g{width:100%;height:100%;border:none}</style>
+</head>
+<body>
+  <!-- Embedded iframe but spoofed to same-origin -->
+  <iframe id="g" style="display:block"></iframe>
+
+  <script>
+    const hijackUrl = "https://www.crazygames.com/embed/wave-dash-geometry-arrow";
+
+    const f = document.getElementById("g");
+    f.src = hijackUrl;
+
+    f.onload = () => {
+      const swCode = `
+        self.addEventListener('fetch', event => {
+          const url = new URL(event.request.url);
+
+          // Spoof headers to make assets load successfully
+          const newHeaders = new Headers(event.request.headers);
+          newHeaders.set('Origin', 'https://www.crazygames.com');
+          newHeaders.set('Referer', 'https://www.crazygames.com/');
+
+          const newReq = new Request(url, {
+            method: event.request.method,
+            headers: newHeaders,
+            mode: 'cors',
+            credentials: 'include'
+          });
+
+          event.respondWith(fetch(newReq));
+        });
+
+        self.addEventListener('activate', () => self.clients.claim());
+      `;
+
+      const blob = new Blob([swCode], { type: "application/javascript" });
+      const swUrl = URL.createObjectURL(blob);
+
+      f.contentWindow.navigator.serviceWorker.register(swUrl, { scope: '/' })
+        .then(() => console.log("✅ Service Worker registered"))
+        .catch(err => console.warn("❌ SW failed", err));
+    };
+  </script>
+<footer style='text-align:center;padding:15px 0;'><custom-links>
+  <a href="https://turbodrift-zone.web.app/epic-hero-quest-idle-rpg.html" target="_blank" rel="noopener">Epic Hero Quest Idle Rpg</a>
+  <a href="https://brain-puzzle-galaxy.netlify.app/flower-fairy-adventure-story.html" target="_blank" rel="noopener">Flower Fairy Adventure Story</a>
+  <a href="https://peullaesi-geim-madang.web.app/new-years-miracles-connect-the-balls.html" target="_blank" rel="noopener">New Years Miracles Connect The Balls</a>
+  <a href="https://shanghai-youxi-web.web.app/zombie-outbreak-survive.html" target="_blank" rel="noopener">Zombie Outbreak Survive</a>
+</custom-links></footer></body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Space Strike: Galaxy Shooter</title>
+  <style>html,body{margin:0;height:100%;background:#000}#g{width:100%;height:100%;border:none}</style>
+</head>
+<body>
+  <!-- Embedded iframe but spoofed to same-origin -->
+  <iframe id="g" style="display:block"></iframe>
+
+  <script>
+    const hijackUrl = "https://html5.gamedistribution.com/de8d6962232a4f9e91344d6ab91141a2/?gd_sdk_referrer_url=https%3A%2F%2Fwww.y8.com%2Fgames%2Fspace-strike-galaxy-shooter";
+
+    const f = document.getElementById("g");
+    f.src = hijackUrl;
+
+    f.onload = () => {
+      const swCode = `
+        self.addEventListener('fetch', event => {
+          const url = new URL(event.request.url);
+
+          // Spoof headers to make assets load successfully
+          const newHeaders = new Headers(event.request.headers);
+          newHeaders.set('Origin', 'https://www.y8.com');
+          newHeaders.set('Referer', 'https://www.y8.com/');
+
+          const newReq = new Request(url, {
+            method: event.request.method,
+            headers: newHeaders,
+            mode: 'cors',
+            credentials: 'include'
+          });
+
+          event.respondWith(fetch(newReq));
+        });
+
+        self.addEventListener('activate', () => self.clients.claim());
+      `;
+
+      const blob = new Blob([swCode], { type: "application/javascript" });
+      const swUrl = URL.createObjectURL(blob);
+
+      f.contentWindow.navigator.serviceWorker.register(swUrl, { scope: '/' })
+        .then(() => console.log("✅ Service Worker registered"))
+        .catch(err => console.warn("❌ SW failed", err));
+    };
+  </script>
+<footer style='text-align:center;padding:15px 0;'><custom-links>
+  <a href="https://luchshie-igry-rus.pages.dev/cyber-arrow.html" target="_blank" rel="noopener">Cyber Arrow</a>
+  <a href="https://brainiac-puzzles.web.app/aim-ninja.html" target="_blank" rel="noopener">Aim Ninja</a>
+  <a href="https://portaldejogos-br.github.io/toca-teens-floating-beach-party.html" target="_blank" rel="noopener">Toca Teens Floating Beach Party</a>
+  <a href="https://juegosgratis-es.netlify.app/category-puzzle-4.html" target="_blank" rel="noopener">Puzzle Games</a>
+</custom-links></footer></body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Wednesday Addams Beauty Salon</title>
+  <style>html,body{margin:0;height:100%;background:#000}#g{width:100%;height:100%;border:none}</style>
+</head>
+<body>
+  <!-- Embedded iframe but spoofed to same-origin -->
+  <iframe id="g" style="display:block"></iframe>
+
+  <script>
+    const hijackUrl = "https://html5.gamedistribution.com/0477016c022d4f4aa5e1f3e8c94fba7b/?gd_sdk_referrer_url=https%3A%2F%2Fwww.y8.com%2Fgames%2Fwednesday-addams-beauty-salon";
+
+    const f = document.getElementById("g");
+    f.src = hijackUrl;
+
+    f.onload = () => {
+      const swCode = `
+        self.addEventListener('fetch', event => {
+          const url = new URL(event.request.url);
+
+          // Spoof headers to make assets load successfully
+          const newHeaders = new Headers(event.request.headers);
+          newHeaders.set('Origin', 'https://www.y8.com');
+          newHeaders.set('Referer', 'https://www.y8.com/');
+
+          const newReq = new Request(url, {
+            method: event.request.method,
+            headers: newHeaders,
+            mode: 'cors',
+            credentials: 'include'
+          });
+
+          event.respondWith(fetch(newReq));
+        });
+
+        self.addEventListener('activate', () => self.clients.claim());
+      `;
+
+      const blob = new Blob([swCode], { type: "application/javascript" });
+      const swUrl = URL.createObjectURL(blob);
+
+      f.contentWindow.navigator.serviceWorker.register(swUrl, { scope: '/' })
+        .then(() => console.log("✅ Service Worker registered"))
+        .catch(err => console.warn("❌ SW failed", err));
+    };
+  </script>
+<footer style='text-align:center;padding:15px 0;'><custom-links>
+  <a href="https://nihongames-web.github.io/woods-of-nevia-forest-survival.html" target="_blank" rel="noopener">Woods Of Nevia Forest Survival</a>
+  <a href="https://trochoimienphi24h.github.io/ibiza-foam-party.html" target="_blank" rel="noopener">Ibiza Foam Party</a>
+  <a href="https://portaldejogos-br.github.io/stack-n-sort.html" target="_blank" rel="noopener">Stack N Sort</a>
+  <a href="https://retro-arcade-zone.netlify.app/mr-macagi-adventures.html" target="_blank" rel="noopener">Mr Macagi Adventures</a>
+</custom-links></footer></body>
+</html>

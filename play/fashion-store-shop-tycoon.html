@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Fashion Store: Shop Tycoon</title>
+  <style>html,body{margin:0;height:100%;background:#000}#g{width:100%;height:100%;border:none}</style>
+</head>
+<body>
+  <!-- Embedded iframe but spoofed to same-origin -->
+  <iframe id="g" style="display:block"></iframe>
+
+  <script>
+    const hijackUrl = "https://fashion-store-shop-tycoon.game-files.crazygames.com/unity/unity2020/fashion-store-shop-tycoon.html?v=2.2";
+
+    const f = document.getElementById("g");
+    f.src = hijackUrl;
+
+    f.onload = () => {
+      const swCode = `
+        self.addEventListener('fetch', event => {
+          const url = new URL(event.request.url);
+
+          // Spoof headers to make assets load successfully
+          const newHeaders = new Headers(event.request.headers);
+          newHeaders.set('Origin', 'https://www.crazygames.com');
+          newHeaders.set('Referer', 'https://www.crazygames.com/');
+
+          const newReq = new Request(url, {
+            method: event.request.method,
+            headers: newHeaders,
+            mode: 'cors',
+            credentials: 'include'
+          });
+
+          event.respondWith(fetch(newReq));
+        });
+
+        self.addEventListener('activate', () => self.clients.claim());
+      `;
+
+      const blob = new Blob([swCode], { type: "application/javascript" });
+      const swUrl = URL.createObjectURL(blob);
+
+      f.contentWindow.navigator.serviceWorker.register(swUrl, { scope: '/' })
+        .then(() => console.log("✅ Service Worker registered"))
+        .catch(err => console.warn("❌ SW failed", err));
+    };
+  </script>
+<footer style='text-align:center;padding:15px 0;'><custom-links>
+  <a href="https://youxi-h5-tiandi.pages.dev/card-clash-battle-arena.html" target="_blank" rel="noopener">Card Clash Battle Arena</a>
+  <a href="https://retro-arcade-zone.netlify.app/battle-racing-stars.html" target="_blank" rel="noopener">Battle Racing Stars</a>
+  <a href="https://hindigame-arena.vercel.app/dogs-spot-the-differences.html" target="_blank" rel="noopener">Dogs Spot The Differences</a>
+  <a href="https://congdonggame-vietnam.web.app/category-free-fashion-games.html" target="_blank" rel="noopener">Free Games</a>
+</custom-links></footer></body>
+</html>

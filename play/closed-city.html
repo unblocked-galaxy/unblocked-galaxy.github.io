@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Closed City</title>
+  <style>html,body{margin:0;height:100%;background:#000}#g{width:100%;height:100%;border:none}</style>
+</head>
+<body>
+  <!-- Embedded iframe but spoofed to same-origin -->
+  <iframe id="g" style="display:block"></iframe>
+
+  <script>
+    const hijackUrl = "https://html5.gamedistribution.com/efa7f45d308f48e9a3f3dc641b83556c/?gd_sdk_referrer_url=https%3A%2F%2Fwww.y8.com%2Fgames%2Fclosed-city";
+
+    const f = document.getElementById("g");
+    f.src = hijackUrl;
+
+    f.onload = () => {
+      const swCode = `
+        self.addEventListener('fetch', event => {
+          const url = new URL(event.request.url);
+
+          // Spoof headers to make assets load successfully
+          const newHeaders = new Headers(event.request.headers);
+          newHeaders.set('Origin', 'https://www.y8.com');
+          newHeaders.set('Referer', 'https://www.y8.com/');
+
+          const newReq = new Request(url, {
+            method: event.request.method,
+            headers: newHeaders,
+            mode: 'cors',
+            credentials: 'include'
+          });
+
+          event.respondWith(fetch(newReq));
+        });
+
+        self.addEventListener('activate', () => self.clients.claim());
+      `;
+
+      const blob = new Blob([swCode], { type: "application/javascript" });
+      const swUrl = URL.createObjectURL(blob);
+
+      f.contentWindow.navigator.serviceWorker.register(swUrl, { scope: '/' })
+        .then(() => console.log("✅ Service Worker registered"))
+        .catch(err => console.warn("❌ SW failed", err));
+    };
+  </script>
+<footer style='text-align:center;padding:15px 0;'><custom-links>
+  <a href="https://koreagame-zone.vercel.app/mob-rush.html" target="_blank" rel="noopener">Mob Rush</a>
+  <a href="https://seoul-game-hub.pages.dev/category-logic538.html" target="_blank" rel="noopener">Logic538 Games</a>
+  <a href="https://gemu-hiroba-japan.web.app/toka-boka-home-clean-up-design.html" target="_blank" rel="noopener">Toka Boka Home Clean Up Design</a>
+  <a href="https://planetejeux-france.pages.dev/unicycle-balance-3d.html" target="_blank" rel="noopener">Unicycle Balance 3D</a>
+</custom-links></footer></body>
+</html>

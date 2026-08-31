@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Watermelon Balls</title>
+  <style>html,body{margin:0;height:100%;background:#000}#g{width:100%;height:100%;border:none}</style>
+</head>
+<body>
+  <!-- Embedded iframe but spoofed to same-origin -->
+  <iframe id="g" style="display:block"></iframe>
+
+  <script>
+    const hijackUrl = "https://watermelon-balls.game-files.crazygames.com/gameframe/up-aps/aps-script-1.4.20.html?game_slug=watermelon-balls&apsType=unity&unityRawIDBId=https://watermelon-balls.game-files.crazygames.com/unity/unity2020";
+
+    const f = document.getElementById("g");
+    f.src = hijackUrl;
+
+    f.onload = () => {
+      const swCode = `
+        self.addEventListener('fetch', event => {
+          const url = new URL(event.request.url);
+
+          // Spoof headers to make assets load successfully
+          const newHeaders = new Headers(event.request.headers);
+          newHeaders.set('Origin', 'https://www.crazygames.com');
+          newHeaders.set('Referer', 'https://www.crazygames.com/');
+
+          const newReq = new Request(url, {
+            method: event.request.method,
+            headers: newHeaders,
+            mode: 'cors',
+            credentials: 'include'
+          });
+
+          event.respondWith(fetch(newReq));
+        });
+
+        self.addEventListener('activate', () => self.clients.claim());
+      `;
+
+      const blob = new Blob([swCode], { type: "application/javascript" });
+      const swUrl = URL.createObjectURL(blob);
+
+      f.contentWindow.navigator.serviceWorker.register(swUrl, { scope: '/' })
+        .then(() => console.log("✅ Service Worker registered"))
+        .catch(err => console.warn("❌ SW failed", err));
+    };
+  </script>
+<footer style='text-align:center;padding:15px 0;'><custom-links>
+  <a href="https://hindigames-hub.netlify.app/bus-escape-clear-jam.html" target="_blank" rel="noopener">Bus Escape Clear Jam</a>
+  <a href="https://unblocked-galaxy.github.io/autumn-glam-gala.html" target="_blank" rel="noopener">Autumn Glam Gala</a>
+  <a href="https://mundodosjogos-br.web.app/dirty-money-the-rich-get-rich.html" target="_blank" rel="noopener">Dirty Money The Rich Get Rich</a>
+  <a href="https://koreagame-zone.vercel.app/category-boxing12.html" target="_blank" rel="noopener">Boxing12 Games</a>
+</custom-links></footer></body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Idle Bathroom Empire Tycoon</title>
+  <style>html,body{margin:0;height:100%;background:#000}#g{width:100%;height:100%;border:none}</style>
+</head>
+<body>
+  <!-- Embedded iframe but spoofed to same-origin -->
+  <iframe id="g" style="display:block"></iframe>
+
+  <script>
+    const hijackUrl = "https://html5.gamedistribution.com/c4e9e00326f941b3b799991cd638ff59/?gd_sdk_referrer_url=https%3A%2F%2Fwww.y8.com%2Fgames%2Fidle-bathroom-empire-tycoon";
+
+    const f = document.getElementById("g");
+    f.src = hijackUrl;
+
+    f.onload = () => {
+      const swCode = `
+        self.addEventListener('fetch', event => {
+          const url = new URL(event.request.url);
+
+          // Spoof headers to make assets load successfully
+          const newHeaders = new Headers(event.request.headers);
+          newHeaders.set('Origin', 'https://www.y8.com');
+          newHeaders.set('Referer', 'https://www.y8.com/');
+
+          const newReq = new Request(url, {
+            method: event.request.method,
+            headers: newHeaders,
+            mode: 'cors',
+            credentials: 'include'
+          });
+
+          event.respondWith(fetch(newReq));
+        });
+
+        self.addEventListener('activate', () => self.clients.claim());
+      `;
+
+      const blob = new Blob([swCode], { type: "application/javascript" });
+      const swUrl = URL.createObjectURL(blob);
+
+      f.contentWindow.navigator.serviceWorker.register(swUrl, { scope: '/' })
+        .then(() => console.log("✅ Service Worker registered"))
+        .catch(err => console.warn("❌ SW failed", err));
+    };
+  </script>
+<footer style='text-align:center;padding:15px 0;'><custom-links>
+  <a href="https://juegosmundial-hoy.pages.dev/fighter-stick-hero.html" target="_blank" rel="noopener">Fighter Stick Hero</a>
+  <a href="https://unblocked-galaxy.web.app/index21.html" target="_blank" rel="noopener">Index21</a>
+  <a href="https://geim-cheon-guk24.pages.dev/category-controller59.html" target="_blank" rel="noopener">Controller59 Games</a>
+  <a href="https://choigamehay24h.github.io/grow-a-garden-online-offline.html" target="_blank" rel="noopener">Grow A Garden Online Offline</a>
+</custom-links></footer></body>
+</html>

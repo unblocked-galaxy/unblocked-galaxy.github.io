@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Shoot Your Nightmare: The Beginning</title>
+  <style>html,body{margin:0;height:100%;background:#000}#g{width:100%;height:100%;border:none}</style>
+</head>
+<body>
+  <!-- Embedded iframe but spoofed to same-origin -->
+  <iframe id="g" style="display:block"></iframe>
+
+  <script>
+    const hijackUrl = "https://shoot-your-nightmare-the-beginning.game-files.crazygames.com/unity/unity56/shoot-your-nightmare-the-beginning.html?v=2.2";
+
+    const f = document.getElementById("g");
+    f.src = hijackUrl;
+
+    f.onload = () => {
+      const swCode = `
+        self.addEventListener('fetch', event => {
+          const url = new URL(event.request.url);
+
+          // Spoof headers to make assets load successfully
+          const newHeaders = new Headers(event.request.headers);
+          newHeaders.set('Origin', 'https://www.crazygames.com');
+          newHeaders.set('Referer', 'https://www.crazygames.com/');
+
+          const newReq = new Request(url, {
+            method: event.request.method,
+            headers: newHeaders,
+            mode: 'cors',
+            credentials: 'include'
+          });
+
+          event.respondWith(fetch(newReq));
+        });
+
+        self.addEventListener('activate', () => self.clients.claim());
+      `;
+
+      const blob = new Blob([swCode], { type: "application/javascript" });
+      const swUrl = URL.createObjectURL(blob);
+
+      f.contentWindow.navigator.serviceWorker.register(swUrl, { scope: '/' })
+        .then(() => console.log("✅ Service Worker registered"))
+        .catch(err => console.warn("❌ SW failed", err));
+    };
+  </script>
+<footer style='text-align:center;padding:15px 0;'><custom-links>
+  <a href="https://jeuxflash-france.netlify.app/unstack-tower.html" target="_blank" rel="noopener">Unstack Tower</a>
+  <a href="https://retro-arcade-zone.netlify.app/brainrot-click-to-hatch.html" target="_blank" rel="noopener">Brainrot Click To Hatch</a>
+  <a href="https://shanghai-youxi-web.web.app/mask-evolution-3d.html" target="_blank" rel="noopener">Mask Evolution 3D</a>
+  <a href="https://jingpin-youxiwang.pages.dev/3d-chess-master.html" target="_blank" rel="noopener">3D Chess Master</a>
+</custom-links></footer></body>
+</html>

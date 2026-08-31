@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>On Fire Basketball Shots</title>
+  <style>html,body{margin:0;height:100%;background:#000}#g{width:100%;height:100%;border:none}</style>
+</head>
+<body>
+  <!-- Embedded iframe but spoofed to same-origin -->
+  <iframe id="g" style="display:block"></iframe>
+
+  <script>
+    const hijackUrl = "https://html5.gamedistribution.com/0e8ab73503cb457a8ae6936f464f4344/?gd_sdk_referrer_url=https%3A%2F%2Fwww.y8.com%2Fgames%2Fon-fire-basketball-shots";
+
+    const f = document.getElementById("g");
+    f.src = hijackUrl;
+
+    f.onload = () => {
+      const swCode = `
+        self.addEventListener('fetch', event => {
+          const url = new URL(event.request.url);
+
+          // Spoof headers to make assets load successfully
+          const newHeaders = new Headers(event.request.headers);
+          newHeaders.set('Origin', 'https://www.y8.com');
+          newHeaders.set('Referer', 'https://www.y8.com/');
+
+          const newReq = new Request(url, {
+            method: event.request.method,
+            headers: newHeaders,
+            mode: 'cors',
+            credentials: 'include'
+          });
+
+          event.respondWith(fetch(newReq));
+        });
+
+        self.addEventListener('activate', () => self.clients.claim());
+      `;
+
+      const blob = new Blob([swCode], { type: "application/javascript" });
+      const swUrl = URL.createObjectURL(blob);
+
+      f.contentWindow.navigator.serviceWorker.register(swUrl, { scope: '/' })
+        .then(() => console.log("✅ Service Worker registered"))
+        .catch(err => console.warn("❌ SW failed", err));
+    };
+  </script>
+<footer style='text-align:center;padding:15px 0;'><custom-links>
+  <a href="https://brainiac-puzzles.web.app/hexa-sort-trick-or-treat.html" target="_blank" rel="noopener">Hexa Sort Trick Or Treat</a>
+  <a href="https://arcadegames-france24.web.app/halloween-merge-mania.html" target="_blank" rel="noopener">Halloween Merge Mania</a>
+  <a href="https://choigamehay24h.github.io/head-soccer-arena.html" target="_blank" rel="noopener">Head Soccer Arena</a>
+  <a href="https://onlinerus-games.netlify.app/pop-fruit.html" target="_blank" rel="noopener">Pop Fruit</a>
+</custom-links></footer></body>
+</html>

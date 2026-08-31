@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Superhero Race!</title>
+  <style>html,body{margin:0;height:100%;background:#000}#g{width:100%;height:100%;border:none}</style>
+</head>
+<body>
+  <!-- Embedded iframe but spoofed to same-origin -->
+  <iframe id="g" style="display:block"></iframe>
+
+  <script>
+    const hijackUrl = "https://superhero-race.game-files.crazygames.com/gameframe/up-aps/aps-script-1.4.20.html?game_slug=superhero-race&apsType=unity&unityRawIDBId=https://superhero-race.game-files.crazygames.com/unity/unity2020";
+
+    const f = document.getElementById("g");
+    f.src = hijackUrl;
+
+    f.onload = () => {
+      const swCode = `
+        self.addEventListener('fetch', event => {
+          const url = new URL(event.request.url);
+
+          // Spoof headers to make assets load successfully
+          const newHeaders = new Headers(event.request.headers);
+          newHeaders.set('Origin', 'https://www.crazygames.com');
+          newHeaders.set('Referer', 'https://www.crazygames.com/');
+
+          const newReq = new Request(url, {
+            method: event.request.method,
+            headers: newHeaders,
+            mode: 'cors',
+            credentials: 'include'
+          });
+
+          event.respondWith(fetch(newReq));
+        });
+
+        self.addEventListener('activate', () => self.clients.claim());
+      `;
+
+      const blob = new Blob([swCode], { type: "application/javascript" });
+      const swUrl = URL.createObjectURL(blob);
+
+      f.contentWindow.navigator.serviceWorker.register(swUrl, { scope: '/' })
+        .then(() => console.log("✅ Service Worker registered"))
+        .catch(err => console.warn("❌ SW failed", err));
+    };
+  </script>
+<footer style='text-align:center;padding:15px 0;'><custom-links>
+  <a href="https://hindigame-arena.vercel.app/youtuber-mcraft-2player.html" target="_blank" rel="noopener">Youtuber Mcraft 2Player</a>
+  <a href="https://gamehay-online.netlify.app/category-snake40.html" target="_blank" rel="noopener">Snake40 Games</a>
+  <a href="https://mundodosjogos-br.web.app/taptapboom.html" target="_blank" rel="noopener">Taptapboom</a>
+  <a href="https://trochoimienphi24h.github.io/index15.html" target="_blank" rel="noopener">Index15</a>
+</custom-links></footer></body>
+</html>

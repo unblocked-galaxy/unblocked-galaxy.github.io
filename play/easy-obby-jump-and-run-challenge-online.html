@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Easy Obby Jump and Run Challenge Online</title>
+  <style>html,body{margin:0;height:100%;background:#000}#g{width:100%;height:100%;border:none}</style>
+</head>
+<body>
+  <!-- Embedded iframe but spoofed to same-origin -->
+  <iframe id="g" style="display:block"></iframe>
+
+  <script>
+    const hijackUrl = "https://html5.gamedistribution.com/d414ff5e4e1d4dbaa67e7e3ddd1364b9/?gd_sdk_referrer_url=https%3A%2F%2Fwww.y8.com%2Fgames%2Feasy-obby-jump-and-run-challenge-online";
+
+    const f = document.getElementById("g");
+    f.src = hijackUrl;
+
+    f.onload = () => {
+      const swCode = `
+        self.addEventListener('fetch', event => {
+          const url = new URL(event.request.url);
+
+          // Spoof headers to make assets load successfully
+          const newHeaders = new Headers(event.request.headers);
+          newHeaders.set('Origin', 'https://www.y8.com');
+          newHeaders.set('Referer', 'https://www.y8.com/');
+
+          const newReq = new Request(url, {
+            method: event.request.method,
+            headers: newHeaders,
+            mode: 'cors',
+            credentials: 'include'
+          });
+
+          event.respondWith(fetch(newReq));
+        });
+
+        self.addEventListener('activate', () => self.clients.claim());
+      `;
+
+      const blob = new Blob([swCode], { type: "application/javascript" });
+      const swUrl = URL.createObjectURL(blob);
+
+      f.contentWindow.navigator.serviceWorker.register(swUrl, { scope: '/' })
+        .then(() => console.log("✅ Service Worker registered"))
+        .catch(err => console.warn("❌ SW failed", err));
+    };
+  </script>
+<footer style='text-align:center;padding:15px 0;'><custom-links>
+  <a href="https://gamehay-online.netlify.app/offroad-crash-climber-4x4.html" target="_blank" rel="noopener">Offroad Crash Climber 4X4</a>
+  <a href="https://zona-juegos-flash.web.app/category-fighting124.html" target="_blank" rel="noopener">Fighting124 Games</a>
+  <a href="https://jeuxflash-france.netlify.app/category-pixel313.html" target="_blank" rel="noopener">Pixel313 Games</a>
+  <a href="https://speed-racing-arcade.pages.dev/wild-west-match-2-the-gold-rush.html" target="_blank" rel="noopener">Wild West Match 2 The Gold Rush</a>
+</custom-links></footer></body>
+</html>
